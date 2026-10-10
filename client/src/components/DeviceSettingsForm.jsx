@@ -3,7 +3,7 @@
  * Integrates the apply_update core function
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { apply_update } from '../core/applyUpdate';
 import { languageOptions } from '../data/initialDevice';
 import SaveStatus from './SaveStatus';
@@ -29,6 +29,32 @@ function DeviceSettingsForm({ initialDevice, actor }) {
   const hasUnsavedChanges = 
     language !== savedDevice.settings.language ||
     volume !== savedDevice.settings.volume;
+
+  // Simulate concurrent update (development feature)
+  const handleSimulateConcurrentUpdate = () => {
+    const updatedDevice = {
+      ...savedDevice,
+      version: savedDevice.version + 1,
+      settings: {
+        ...savedDevice.settings,
+        volume: savedDevice.settings.volume === 5 ? 1 : savedDevice.settings.volume + 1
+      }
+    };
+    setSavedDevice(updatedDevice);
+    setSuccessMessage(`⚠️ Simulated concurrent update! Version is now ${updatedDevice.version}, volume changed to ${updatedDevice.settings.volume}. Try saving your changes to see the conflict.`);
+    setTimeout(() => setSuccessMessage(null), 8000);
+  };
+
+  // Listen for simulate event from sidebar button
+  useEffect(() => {
+    const handleSimulateEvent = () => {
+      handleSimulateConcurrentUpdate();
+    };
+    window.addEventListener('simulateConcurrentUpdate', handleSimulateEvent);
+    return () => {
+      window.removeEventListener('simulateConcurrentUpdate', handleSimulateEvent);
+    };
+  }, [savedDevice]);
 
   // Handle save
   const handleSave = (e) => {
@@ -105,21 +131,6 @@ function DeviceSettingsForm({ initialDevice, actor }) {
     setConflictData(null);
   };
 
-  // Simulate concurrent update (development feature)
-  const handleSimulateConcurrentUpdate = () => {
-    const updatedDevice = {
-      ...savedDevice,
-      version: savedDevice.version + 1,
-      settings: {
-        ...savedDevice.settings,
-        volume: savedDevice.settings.volume === 5 ? 1 : savedDevice.settings.volume + 1
-      }
-    };
-    setSavedDevice(updatedDevice);
-    setSuccessMessage(`⚠️ Simulated concurrent update! Version is now ${updatedDevice.version}, volume changed to ${updatedDevice.settings.volume}. Try saving your changes to see the conflict.`);
-    setTimeout(() => setSuccessMessage(null), 8000);
-  };
-
   return (
     <div>
       {/* Success Message */}
@@ -159,8 +170,8 @@ function DeviceSettingsForm({ initialDevice, actor }) {
 
       {/* Settings Form */}
       <div className="card shadow-sm border-0 hover-lift">
-        <div className="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
-          <h6 className="mb-0 text-secondary fw-semibold">
+        <div className="card-header border-0 py-3 px-4" style={{ background: 'linear-gradient(135deg, rgb(9 31 135) 0%, rgb(28 7 50) 100%)' }}>
+          <h6 className="mb-0 fw-semibold text-white">
             <i className="bi bi-sliders me-2"></i>
             Device Settings
           </h6>
@@ -170,7 +181,7 @@ function DeviceSettingsForm({ initialDevice, actor }) {
             lastSaved={lastSaved}
           />
         </div>
-        <div className="card-body pt-3">
+        <div className="card-body p-4">
           <form onSubmit={handleSave}>
             {/* Language Setting */}
             <div className="mb-4">
@@ -247,82 +258,55 @@ function DeviceSettingsForm({ initialDevice, actor }) {
                     </div>
                   </div>
 
-                  <div className="d-flex justify-content-between text-muted small">
+                  <div className="d-flex justify-content-between text-muted small mb-2">
                     <span><i className="bi bi-volume-mute"></i> Silent</span>
                     <span><i className="bi bi-volume-down"></i> Low</span>
                     <span><i className="bi bi-volume-up"></i> Medium</span>
                     <span><i className="bi bi-volume-up-fill"></i> Maximum</span>
                   </div>
 
-                  <div className="form-text mt-2">
+                  <div className="form-text mb-3">
                     <i className="bi bi-info-circle me-1"></i>
                     Drag the liquid gauge or use keyboard arrows to adjust volume (0-5)
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="d-flex gap-2">
+                    <button
+                      type="submit"
+                      className="btn btn-primary px-4 shadow-sm"
+                      disabled={isSaving || !hasUnsavedChanges}
+                      style={{ height: '38px' }}
+                    >
+                      {isSaving ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-check2-circle me-2"></i>
+                          Save Changes
+                        </>
+                      )}
+                    </button>
+
+                    {hasUnsavedChanges && !isSaving && (
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary px-3"
+                        onClick={handleDiscard}
+                        style={{ height: '38px' }}
+                      >
+                        <i className="bi bi-x-circle me-2"></i>
+                        Discard
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="d-flex gap-3">
-              <button
-                type="submit"
-                className="btn btn-primary btn-lg px-4 shadow-sm"
-                disabled={isSaving || !hasUnsavedChanges}
-              >
-                {isSaving ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Saving Changes...
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-check2-circle me-2"></i>
-                    Save Changes
-                  </>
-                )}
-              </button>
-
-              {hasUnsavedChanges && !isSaving && (
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary btn-lg px-4"
-                  onClick={handleDiscard}
-                >
-                  <i className="bi bi-x-circle me-2"></i>
-                  Discard
-                </button>
-              )}
-            </div>
           </form>
-        </div>
-      </div>
-
-      {/* Development Tools */}
-      <div className="mt-4">
-        <div className="card border-warning border-2 shadow-sm hover-lift">
-          <div className="card-header bg-warning bg-opacity-10 border-0">
-            <h6 className="mb-0 text-warning fw-semibold">
-              <i className="bi bi-tools me-2"></i>
-              Development & Testing Tools
-            </h6>
-          </div>
-          <div className="card-body">
-            <p className="small text-secondary mb-3">
-              <i className="bi bi-info-circle me-1"></i>
-              Simulate a concurrent edit from another user to test conflict detection and resolution workflow:
-            </p>
-            <button
-              type="button"
-              className="btn btn-warning shadow-sm"
-              onClick={handleSimulateConcurrentUpdate}
-            >
-              <i className="bi bi-lightning-fill me-2"></i>
-              Simulate Concurrent Update
-            </button>
-            <p className="small text-muted mt-3 mb-0 fst-italic">
-              This will update the saved device version and settings, causing your next save attempt to return a 409 CONFLICT status.
-            </p>
-          </div>
         </div>
       </div>
     </div>

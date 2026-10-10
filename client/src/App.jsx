@@ -25,27 +25,27 @@ function App() {
   return (
     <div className="min-vh-100 bg-light">
       {/* Compact Header */}
-      <nav className="navbar navbar-dark bg-dark shadow-sm border-bottom border-primary">
+      <nav className="navbar navbar-dark bg-dark shadow-sm border-bottom border-primary" style={{ minHeight: '64px' }}>
         <div className="container-fluid px-3 px-md-4">
-          <div className="d-flex align-items-center w-100">
-            <span className="navbar-brand mb-0 h5 fw-bold d-flex align-items-center flex-shrink-0">
-              <i className="bi bi-gear-wide-connected me-2 text-primary"></i>
+          <div className="d-flex align-items-center w-100 gap-2">
+            <span className="navbar-brand mb-0 h4 fw-bold d-flex align-items-center flex-shrink-0">
+              <i className="bi bi-gear-wide-connected me-2 text-primary fs-3"></i>
               <span className="d-none d-md-inline">Device Settings</span>
               <span className="d-md-none">Settings</span>
             </span>
             
-            <div className="d-flex align-items-center gap-2 ms-auto">
+            <div className="d-flex align-items-center gap-2 ms-auto flex-nowrap">
               {/* Actor Selector - Dev Feature */}
-              <div className="d-flex align-items-center gap-2">
-                <label htmlFor="actor-select" className="text-white-50 small mb-0 d-none d-md-inline">
+              <div className="d-flex align-items-center gap-2 flex-nowrap">
+                <label htmlFor="actor-select" className="text-white-50 small mb-0 d-none d-lg-inline text-nowrap">
                   Demo Actor:
                 </label>
                 <select
                   id="actor-select"
-                  className="form-select form-select-sm"
+                  className="form-select form-select-sm py-1"
                   value={selectedActorId}
                   onChange={(e) => setSelectedActorId(e.target.value)}
-                  style={{ maxWidth: '200px' }}
+                  style={{ minWidth: '170px', width: 'auto', fontSize: '0.875rem', lineHeight: '1.5' }}
                 >
                   {actorOptions.map(opt => (
                     <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -54,7 +54,7 @@ function App() {
               </div>
 
               <button
-                className="btn btn-sm btn-outline-primary"
+                className="btn btn-sm btn-outline-primary flex-shrink-0"
                 onClick={() => setShowTests(!showTests)}
               >
                 <i className="bi bi-code-square me-1"></i>
@@ -86,9 +86,9 @@ function App() {
           <div className="col-lg-4">
             {/* Info Card - Compact */}
             <div className="card shadow-sm border-0 mb-3">
-              <div className="card-header bg-white border-bottom">
-                <h6 className="mb-0 fw-semibold small">
-                  <i className="bi bi-info-circle me-2 text-primary"></i>
+              <div className="card-header border-0 py-3 px-4" style={{ background: 'linear-gradient(135deg, rgb(9 31 135) 0%, rgb(28 7 50) 100%)' }}>
+                <h6 className="mb-0 fw-semibold small text-white">
+                  <i className="bi bi-info-circle me-2"></i>
                   System Features
                 </h6>
               </div>
@@ -114,21 +114,45 @@ function App() {
               </div>
             </div>
 
-            {/* Testing Guide - Compact */}
+            {/* Testing Guide & Dev Tools - Compact */}
             <div className="card shadow-sm border-0 border-start border-primary border-3">
-              <div className="card-header bg-primary bg-opacity-10 border-0">
-                <h6 className="mb-0 fw-semibold small text-primary">
+              <div className="card-header border-0 py-3 px-4" style={{ background: 'linear-gradient(135deg, rgb(9 31 135) 0%, rgb(28 7 50) 100%)' }}>
+                <h6 className="mb-0 fw-semibold small text-white">
                   <i className="bi bi-lightbulb me-2"></i>
                   Quick Test Guide
                 </h6>
               </div>
               <div className="card-body p-3">
-                <ol className="small mb-0 ps-3">
+                <ol className="small mb-3 ps-3">
                   <li className="mb-2">Change settings and save</li>
                   <li className="mb-2">Simulate concurrent update</li>
                   <li className="mb-2">Try saving again</li>
                   <li>Resolve the conflict</li>
                 </ol>
+                
+                {/* Development Tools Section */}
+                <div className="border-top pt-3 mt-3">
+                  <h6 className="small fw-semibold text-warning mb-2">
+                    <i className="bi bi-tools me-1"></i>
+                    Development Tools
+                  </h6>
+                  <p className="small text-muted mb-2">
+                    Simulate a concurrent edit to test conflict detection:
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-warning w-100"
+                    onClick={() => {
+                      // Trigger the simulate function from form
+                      const event = new CustomEvent('simulateConcurrentUpdate');
+                      window.dispatchEvent(event);
+                    }}
+                  >
+                    <i className="bi bi-lightning-fill me-2"></i>
+                    Simulate Concurrent Update
+                  </button>
+                </div>
+
                 <div className="alert alert-info small mb-0 mt-3 p-2">
                   <i className="bi bi-info-circle me-1"></i>
                   <strong>Demo:</strong> Use actor selector above to test permissions

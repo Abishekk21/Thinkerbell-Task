@@ -5,13 +5,13 @@
 function DeviceStatusCard({ device }) {
   return (
     <div className="card shadow-sm border-0 hover-lift">
-      <div className="card-header bg-white border-bottom-0 pb-0">
-        <h6 className="mb-0 text-secondary fw-semibold">
+      <div className="card-header border-0 py-3 px-4" style={{ background: 'linear-gradient(135deg, rgb(9 31 135) 0%, rgb(28 7 50) 100%)' }}>
+        <h6 className="mb-0 fw-semibold text-white">
           <i className="bi bi-hdd-rack me-2"></i>
           Device Information
         </h6>
       </div>
-      <div className="card-body pt-3">
+      <div className="card-body p-4">
         <div className="row g-4">
           <div className="col-md-4">
             <div className="d-flex flex-column">

@@ -317,11 +317,17 @@ function TestRunner() {
 
   return (
     <>
-      <div className="card-body">
+      <div className="card-body p-4">
         {!results && !isRunning && (
-          <p className="text-muted mb-0">
-            Click &quot;Run All Tests&quot; to execute the complete test suite in the browser.
-          </p>
+          <div className="text-center py-4">
+            <i className="bi bi-code-slash fs-1 text-primary mb-3 d-block"></i>
+            <p className="text-muted mb-0">
+              Click &quot;Run All Tests&quot; to execute the complete test suite in the browser.
+            </p>
+            <p className="text-muted small mt-2 mb-0">
+              {testSuites.reduce((sum, suite) => sum + suite.tests.length, 0)} tests ready to run
+            </p>
+          </div>
         )}
 
         {isRunning && (
@@ -329,7 +335,7 @@ function TestRunner() {
             <div className="spinner-border text-primary mb-3" role="status">
               <span className="visually-hidden">Running tests...</span>
             </div>
-            <p className="text-muted">Running tests...</p>
+            <p className="text-muted mb-0">Running tests...</p>
           </div>
         )}
 
@@ -356,7 +362,7 @@ function TestRunner() {
             {/* Test Suites */}
             {results.suites.map((suite, idx) => (
               <div key={idx} className="mb-4">
-                <h6 className="text-secondary mb-3">
+                <h6 className="text-secondary mb-3 fw-semibold">
                   <i className="bi bi-folder2-open me-2"></i>
                   {suite.name}
                 </h6>
@@ -372,8 +378,8 @@ function TestRunner() {
                         <i className={`bi ${test.passed ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'} me-2`}></i>
                         {test.name}
                         {!test.passed && test.error && (
-                          <div className="small text-danger mt-1">
-                            Error: {test.error}
+                          <div className="small text-danger mt-1 ms-4">
+                            <strong>Error:</strong> {test.error}
                           </div>
                         )}
                       </div>
@@ -387,13 +393,13 @@ function TestRunner() {
       </div>
 
       {/* Run Tests Button - Positioned at bottom */}
-      <div className="card-footer bg-dark border-0 d-flex justify-content-between align-items-center">
+      <div className="card-footer bg-dark border-0 d-flex justify-content-between align-items-center p-3">
         <span className="text-white-50 small">
           <i className="bi bi-info-circle me-1"></i>
           Click to execute all {testSuites.reduce((sum, suite) => sum + suite.tests.length, 0)} tests
         </span>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary px-4"
           onClick={runTests}
           disabled={isRunning}
         >
